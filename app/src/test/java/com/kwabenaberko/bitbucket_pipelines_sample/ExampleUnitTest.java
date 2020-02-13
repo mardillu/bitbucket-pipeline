@@ -22,6 +22,6 @@ public class ExampleUnitTest {
 
     @Test
     public void addition_isCorrect() {
-        assertEquals(7, 3 + 9);
+        assertEquals(12, 3 + 9);
     }
 }
