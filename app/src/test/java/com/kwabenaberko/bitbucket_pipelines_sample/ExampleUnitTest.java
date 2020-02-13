@@ -16,7 +16,12 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void addition_isCorrect() {
+    public void addition_isCorrect@() {
         assertEquals(7, 3 + 4);
+    }
+
+    @Test
+    public void addition_isInCorrect() {
+        assertEquals(12, 3 + 9);
     }
 }
