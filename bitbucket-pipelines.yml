@@ -1,6 +1,6 @@
 # This is a sample build configuration for Java (Gradle).
 # Check our guides at https://confluence.atlassian.com/x/zd-5Mw for more examples.
-# Only use spaces to indent your .yml configuration.
+# Only use spaces to indent your .yml configuration. z5EEZDhhTXvpwGFAm7cU
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
 image: mingc/android-build-box:latest
@@ -8,14 +8,20 @@ image: mingc/android-build-box:latest
 pipelines:
   default:
     - step:
+        name: Build, UI Test and Coverage
         caches:
           - gradle
-        script:
+          - gradlewrapper
+          - androidavd
+        artifacts: 
+          - opt/atlassian/pipelines/agent/build/app/*
+        script: 
           - chmod +x gradlew
-#         - ./gradlew assembleDebug
-          - ./gradlew test
-          - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
-          - emulator -avd testAVD -no-audio -no-window &
+          - chmod +x ./scripts/android-wait-for-emulator.sh
+          - chmod +x ./scripts/stop-emulators.sh
+          - ./gradlew assembleDebug
+          - sdkmanager "system-images;android-16;default;armeabi-v7a" && echo "no" | avdmanager create avd -n test -k "system-images;android-16;default;armeabi-v7a" -c 100M --force
+          - emulator -avd test -no-audio -no-window &
           - ./scripts/android-wait-for-emulator.sh
           - adb devices
           - adb shell settings put global window_animation_scale 0 &
@@ -23,4 +29,22 @@ pipelines:
           - adb shell settings put global animator_duration_scale 0 &
           - adb shell input keyevent 82 &
           - ./gradlew connectedAndroidTest
+          - ./gradlew createDebugCoverageReport
           - ./scripts/stop-emulators.sh
+          #- curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/jenymotion/bitbucket-pipeline/downloads" --form files=@"/opt/atlassian/pipelines/agent/build/app/build/outputs/androidTest-results/connected/TEST-test(AVD) - 4.1.2-app-.xml"
+    - step:
+       caches:
+        - gradle
+        - gradlewrapper
+        - androidavd
+       name: Unit Tests
+       script:
+        - chmod +x gradlew
+        - chmod +x ./scripts/android-wait-for-emulator.sh
+        - chmod +x ./scripts/stop-emulators.sh
+        - ./gradlew test
+
+definitions:
+  caches:
+    gradlewrapper: ~/.gradle/wrapper
+    androidavd: $ANDROID_HOME/.android/avd
