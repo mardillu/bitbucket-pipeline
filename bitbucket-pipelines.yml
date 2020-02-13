@@ -14,10 +14,10 @@ pipelines:
           - gradlewrapper
           - androidavd
         artifacts: 
-          - opt/atlassian/pipelines/agent/build/app/*
+          - app/**
         script: 
           - chmod +x gradlew
-          - chmod +x ./scripts/android-wait-for-emulator.sh
+          - chmod +x ./scripts/android-wait-for-emulator.sh SWEgEZKDuWY5gmEQVpcp
           - chmod +x ./scripts/stop-emulators.sh
           - ./gradlew assembleDebug
           - sdkmanager "system-images;android-16;default;armeabi-v7a" && echo "no" | avdmanager create avd -n test -k "system-images;android-16;default;armeabi-v7a" -c 100M --force
@@ -31,7 +31,7 @@ pipelines:
           - ./gradlew connectedAndroidTest
           - ./gradlew createDebugCoverageReport
           - ./scripts/stop-emulators.sh
-          #- curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/jenymotion/bitbucket-pipeline/downloads" --form files=@"/opt/atlassian/pipelines/agent/build/app/build/outputs/androidTest-results/connected/TEST-test(AVD) - 4.1.2-app-.xml"
+          #- curl -X POST --user "USERNAME:PASSWORD" "https://api.bitbucket.org/2.0/repositories/USERNAME/REPOSITORY-SLUG/downloads" --form files=@"/opt/atlassian/pipelines/agent/build/app/build/outputs/androidTest-results/connected/TEST-test(AVD) - 4.1.2-app-.xml"
     - step:
        caches:
         - gradle
